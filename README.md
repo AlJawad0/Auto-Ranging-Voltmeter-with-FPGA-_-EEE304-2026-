@@ -1,6 +1,6 @@
 ## **FPGA-Based Auto-Scaling Digital Voltmeter EEE304-2026**
 
-A high-precision digital voltmeter implemented on Basys 3 (Artix-7) FPGA featuring automatic range switching (3.3V/10V) with hysteresis protection and real-time 7-segment display.
+A high-precision digital voltmeter implemented on **Nexys A7-100T** (Artix-7 XC7A100T) featuring automatic range switching (3.3V/10V) with hysteresis protection and real-time 7-segment display.
 
 ---
 
@@ -17,32 +17,38 @@ A high-precision digital voltmeter implemented on Basys 3 (Artix-7) FPGA featuri
 ---
 
 ### Hardware Requirements
-- **FPGA Board**: Basys 3 (Artix-7) or compatible Xilinx board
+- **FPGA Board**: Nexys A7-100T (Digilent) or Nexys A7-50T
 - **Analog Multiplexer**: CD4051BE
 - **Voltage Dividers**:
   - 3.3V Range: 1/3 divider network (R=28.5kΩ total)
   - 10V Range: 1/10 divider network (R=94.5kΩ total)
-- **Display**: On-board 7-segment display (active low)
+- **Display**: On-board 7-segment display (active low, common anode)
 - **Input**: DC Voltage source (0-10V max)
 
 ---
 
-### Pinout & Connections
+### Pinout & Connections (Nexys A7)
 
 | FPGA Pin | Connection | Description |
 |----------|------------|-------------|
-| `vauxp3` / `vauxn3` | CD4051 Output (Pin 13) | Differential ADC input |
+| `vauxp3` / `vauxn3` | CD4051 Output (Pin 13) | Differential ADC input (JXADC connector) |
 | `pmod` | CD4051 Pin A (Pin 11) | Range select (0=CH0/10V, 1=CH1/3.3V) |
-| `sw` | On-board switch | Mode select (0=Auto, 1=Manual 10V) |
+| `sw` | On-board switch (SW0) | Mode select (0=Auto, 1=Manual 10V) |
 | `an[7:0]` | 7-segment anodes | Display control (active low) |
 | `seg[6:0]` | 7-segment cathodes | Segment control |
 | `LED[15:0]` | On-board LEDs | ADC level bar graph |
 
 **CD4051 Configuration:**
-- **CH0 (10V)**: Connect to 1/10 divider output
-- **CH1 (3.3V)**: Connect to 1/3 divider output  
-- **Pins B & C**: Ground (logic 0)
-- **Inhibit**: Ground (active low enable)
+- **CH0 (10V)**: Connect to 1/10 divider output → CD4051 Pin 13 (COM) when A=0
+- **CH1 (3.3V)**: Connect to 1/3 divider output → CD4051 Pin 13 (COM) when A=1  
+- **Pin A (11)**: Connect to FPGA `pmod` output
+- **Pins B (10) & C (9)**: Ground (logic 0)
+- **Inhibit (6)**: Ground (active low enable)
+- **VDD (16)**: 5V or 3.3V from FPGA PMOD header
+- **VSS (8)**, **VEE (7)**: Ground
+
+**XADC Connection (Nexys A7 JXADC):**
+- Connect CD4051 output to **JXADC Pin 1 (AD3P)** and **Pin 7 (AD3N)** for differential input
 
 ---
 
@@ -54,7 +60,7 @@ A high-precision digital voltmeter implemented on Basys 3 (Artix-7) FPGA featuri
    - **Manual Mode** (`SW=1`): Forces 10V range regardless of input
 3. **Read Display**: 
    - Format: `XX.YY` (e.g., `05.29` = 5.29V)
-   - Decimal point fixed at hundreds place
+   - Decimal point fixed at hundreds place (AN6)
 4. **Over-range**: Displays overflow pattern if input exceeds range limits
 
 ---
@@ -91,7 +97,7 @@ XADCdemo (Top)
 ### Safety Notes
 ⚠️ **Do not exceed 12V input** to prevent damage to analog multiplexer  
 ⚠️ **Verify CD4051 VDD** (3.3V/5V) before connecting  
-⚠️ **Differential ADC inputs**: Ensure proper grounding of `vauxn3`
+⚠️ **Differential ADC inputs**: Ensure proper grounding of `vauxn3` (JXADC Pin 7)
 
 ---
 
