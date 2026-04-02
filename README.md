@@ -1,4 +1,4 @@
-**FPGA-Based Auto-Scaling Digital Voltmeter EEE304-2026**
+##**FPGA-Based Auto-Scaling Digital Voltmeter EEE304-2026**
 
 A high-precision digital voltmeter implemented on Basys 3 (Artix-7) FPGA featuring automatic range switching (3.3V/10V) with hysteresis protection and real-time 7-segment display.
 
